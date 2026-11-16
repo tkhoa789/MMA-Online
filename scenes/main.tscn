@@ -1,0 +1,235 @@
+[gd_scene load_steps=10 format=3 uid="uid://b00t38v62y5pq"]
+
+[ext_resource type="PackedScene" path="res://scenes/arena.tscn" id="1_arena"]
+[ext_resource type="PackedScene" path="res://scenes/fighter_female.tscn" id="2_female"]
+[ext_resource type="PackedScene" path="res://scenes/fighter_male.tscn" id="3_male"]
+[ext_resource type="Script" path="res://scripts/camera_controller.gd" id="4_camera"]
+[ext_resource type="Script" path="res://scripts/fight_hud.gd" id="5_hud"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bar_bg"]
+bg_color = Color(0.12, 0.12, 0.15, 0.85)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_blue_hp"]
+bg_color = Color(0.15, 0.45, 0.95, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_stam_fill"]
+bg_color = Color(0.2, 0.8, 0.85, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_red_hp"]
+bg_color = Color(0.9, 0.18, 0.18, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="Main" type="Node3D"]
+
+[node name="Arena" parent="." instance=ExtResource("1_arena")]
+
+[node name="Fighter_Female" parent="." node_paths=PackedStringArray("opponent") instance=ExtResource("2_female")]
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, -2.2, 0, -1)
+opponent = NodePath("../Fighter_Male")
+
+[node name="Fighter_Male" parent="." node_paths=PackedStringArray("opponent") instance=ExtResource("3_male")]
+transform = Transform3D(-0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, -0.866025, 2.2, 0, 1)
+opponent = NodePath("../Fighter_Female")
+
+[node name="FightCamera" type="Camera3D" parent="." node_paths=PackedStringArray("target_player", "target_opponent")]
+transform = Transform3D(0.5, 0.224144, -0.836516, 0, 0.965926, 0.258819, 0.866025, -0.12941, 0.482963, -3.2, 2.2, 3.2)
+current = true
+fov = 52.0
+script = ExtResource("4_camera")
+target_player = NodePath("../Fighter_Female")
+target_opponent = NodePath("../Fighter_Male")
+min_distance = 2.8
+max_distance = 6.2
+base_height = 1.5
+follow_speed = 8.0
+
+[node name="UI" type="CanvasLayer" parent="." node_paths=PackedStringArray("fighter_female", "fighter_male")]
+script = ExtResource("5_hud")
+fighter_female = NodePath("../Fighter_Female")
+fighter_male = NodePath("../Fighter_Male")
+
+[node name="TopBar" type="HBoxContainer" parent="UI"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 36.0
+offset_top = 20.0
+offset_right = -36.0
+offset_bottom = 75.0
+grow_horizontal = 2
+theme_override_constants/separation = 30
+
+[node name="P1_Container" type="VBoxContainer" parent="UI/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LblName" type="Label" parent="UI/TopBar/P1_Container"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 0.75, 1, 1)
+theme_override_font_sizes/font_size = 17
+text = "BLUE CORNER: FEMALE FIGHTER [YOU]"
+
+[node name="P1_HP" type="ProgressBar" parent="UI/TopBar/P1_Container"]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_blue_hp")
+value = 100.0
+show_percentage = false
+
+[node name="P1_Stam" type="ProgressBar" parent="UI/TopBar/P1_Container"]
+custom_minimum_size = Vector2(0, 7)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_stam_fill")
+value = 100.0
+show_percentage = false
+
+[node name="VS" type="Label" parent="UI/TopBar"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.2, 1)
+theme_override_font_sizes/font_size = 26
+text = "VS"
+horizontal_alignment = 1
+
+[node name="P2_Container" type="VBoxContainer" parent="UI/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LblName" type="Label" parent="UI/TopBar/P2_Container"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.35, 0.35, 1)
+theme_override_font_sizes/font_size = 17
+text = "RED CORNER: MALE OPPONENT"
+horizontal_alignment = 2
+
+[node name="P2_HP" type="ProgressBar" parent="UI/TopBar/P2_Container"]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_bar_bg")
+theme_override_styles/fill = SubResource("StyleBoxFlat_red_hp")
+fill_mode = 1
+value = 100.0
+show_percentage = false
+
+[node name="KOBanner" type="Label" parent="UI"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -280.0
+offset_top = -60.0
+offset_right = 280.0
+offset_bottom = 60.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.15, 0.15, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_font_sizes/font_size = 40
+text = "KNOCKOUT!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BtnRestart" type="Button" parent="UI"]
+visible = false
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = 80.0
+offset_right = 100.0
+offset_bottom = 126.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_font_sizes/font_size = 17
+text = "RESTART BOUT"
+
+[node name="GamepadHUD" type="Panel" parent="UI"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -135.0
+offset_right = 350.0
+offset_bottom = -20.0
+grow_vertical = 0
+theme_override_styles/panel = SubResource("StyleBoxFlat_bar_bg")
+
+[node name="StickBg" type="Panel" parent="UI/GamepadHUD"]
+layout_mode = 0
+offset_left = 18.0
+offset_top = 22.0
+offset_right = 80.0
+offset_bottom = 84.0
+
+[node name="StickKnob" type="Panel" parent="UI/GamepadHUD/StickBg"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 38.0
+offset_bottom = 38.0
+
+[node name="Lbl_Jab" type="Label" parent="UI/GamepadHUD"]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 14.0
+offset_right = 220.0
+offset_bottom = 37.0
+theme_override_font_sizes/font_size = 13
+text = "[X / J] Left Jab"
+
+[node name="Lbl_Cross" type="Label" parent="UI/GamepadHUD"]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 37.0
+offset_right = 220.0
+offset_bottom = 60.0
+theme_override_font_sizes/font_size = 13
+text = "[Y / K] Right Cross"
+
+[node name="Lbl_KickL" type="Label" parent="UI/GamepadHUD"]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 60.0
+offset_right = 240.0
+offset_bottom = 83.0
+theme_override_font_sizes/font_size = 13
+text = "[A / U] Lead Body Kick"
+
+[node name="Lbl_KickR" type="Label" parent="UI/GamepadHUD"]
+layout_mode = 0
+offset_left = 100.0
+offset_top = 83.0
+offset_right = 240.0
+offset_bottom = 106.0
+theme_override_font_sizes/font_size = 13
+text = "[B / I] Rear Body Kick"
+
+[node name="Lbl_Block" type="Label" parent="UI/GamepadHUD"]
+layout_mode = 0
+offset_left = 230.0
+offset_top = 14.0
+offset_right = 330.0
+offset_bottom = 37.0
+theme_override_font_sizes/font_size = 13
+text = "[LT / Shift] Guard"

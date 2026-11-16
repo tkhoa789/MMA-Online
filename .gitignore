@@ -1,0 +1,20 @@
+# Godot 4.x cache & internal files
+.godot/
+*.translation
+
+# Binaries (Portable engine auto-fetched via run_game.bat / open_editor.bat)
+Godot_v*
+*.exe
+*.dll
+
+# Root-level test screenshots & temp files
+*.png
+!assets/**
+*.jpg
+!assets/**
+
+# OS & temp
+Thumbs.db
+.DS_Store
+*.tmp
+*.log
